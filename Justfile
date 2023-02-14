@@ -1,10 +1,13 @@
 @list:
   just --list
 
-# NOTE: Not needed if you use Calva connection "backend + frontend"
-# Start backend repl.
+# NOTE: The backend repls scripts are not needed if you use Calva connection "backend + frontend"
+# Just start the 'just frontend', since Calva connects to the frontend
+# and uses the backend repl via shadow-cljs.
 @backend-calva:
-  clj -M:dev:test:common:backend:calva-backend:kari -i -C
+  clj -M:dev:test:common:backend:calva:kari
+@backend-calva-nrepl:
+  clj -M:dev:test:common:backend:calva:kari -m nrepl.cmdline
 
 # Init node packages.
 @init:
@@ -13,7 +16,9 @@
   rm -rf node_modules
   npm install
 
-# Start frontend auto-compilation
+# Start frontend auto-compilation, and also needed for Calva to connect to the backend.
+# Then in Calva give command: `Calva: Connect to a running REPL Server in the Project`. 
+# Then choose: `backend + frontend`.
 @frontend:
   npm run dev
 

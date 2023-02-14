@@ -13,3 +13,6 @@ prod-resources/
 .lsp/
 tmp/
 personal/
+.calva/
+.nrepl-port
+logs/

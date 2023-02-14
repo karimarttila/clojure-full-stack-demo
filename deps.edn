@@ -28,7 +28,6 @@
                                   ring/ring-json {:mvn/version "0.5.1"}
                                   ring/ring-defaults {:mvn/version "0.3.4"}
                                   buddy/buddy-sign {:mvn/version "3.4.333"}
-                                  org.eclipse.jetty/jetty-client {:mvn/version "11.0.13"}
                                   clj-http/clj-http {:mvn/version "3.12.3"}
                                   nrepl/nrepl {:mvn/version "1.0.0"}}}
 

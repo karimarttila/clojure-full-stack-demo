@@ -201,8 +201,12 @@
   (start))
 
 (comment
-  (reagent.dom/render [])
-
+  ; With Calva, no need for this:
+  ;(shadow.cljs.devtools.api/repl :app)
+  ; But you have to start the browser since the browser is the runtime for the repl!
+  ; http://localhost:7171
+  (+ 1 2)
+  ;(reagent.dom/render [])
   ;(require '[hashp.core :include-macros true])
   ;(let [a #p (range 5)] a)
   )
