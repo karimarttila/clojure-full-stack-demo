@@ -9,6 +9,7 @@
             [reitit.frontend.controllers :as rfc]
             [reitit.frontend.easy :as rfe]
             [frontend.util :as f-util]
+            [frontend.header :as f-header]
             [frontend.signin :as f-signin]
             [frontend.state :as f-state]
             ;; [frontend.login :as f-login]
@@ -165,8 +166,8 @@
   (let [current-route @(re-frame/subscribe [::f-state/current-route])
         path-params (:path-params current-route)
         _ (f-util/clog "router-component, path-params" path-params)]
-    [:div.f-main
-     [f-util/header]
+    [:div
+     [f-header/header]
      ; NOTE: when you supply the current-route to the view it can parse path-params there (from path)
      (when current-route
        [(-> current-route :data :view) current-route])]))
@@ -190,7 +191,7 @@
                 ;;  (if (:open? @dev-tools/dev-state)
                 ;;    {:style {:padding-bottom (str (:height @dev-tools/dev-state) "px")}})
                  ]
-                (.getElementById js/document "app")))
+                (.getElementById js/document "root")))
 
 
 (defn ^:export init []
@@ -210,3 +211,5 @@
   ;(require '[hashp.core :include-macros true])
   ;(let [a #p (range 5)] a)
   )
+
+

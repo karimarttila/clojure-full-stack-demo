@@ -20,7 +20,8 @@ Using Calva you just need to start the frontend REPL: `just frontend`.
 
 Then in Calva give command: `Calva: Connect to a running REPL Server in the Project`. Then: `backend + frontend` (see: [Configuring VSCode/Calva for Clojure programming - Part 3](https://www.karimarttila.fi/clojure/2022/10/18/clojure-calva-part3.html)).
 
-Now you have the REPL in Calva, the the output window is the same for clj and cljs repls.
+Now you have the REPL in Calva, the output window is the same for clj and cljs repls.
 
+Once you have both frontend and backend REPLs running, and you have done the Integrant reset (see in file `user.clj`: `(reset)` ), you can see the frontend in browser at `http://localhost:7171`. The backend is also running at the same port, see examples in the `scripts` directory.
 
- Once you have both frontend and backend REPLs running, and you have done the Integrant reset (see in file `user.clj`), you can see the frontend in browser at `http://localhost:6161`. The backend is also running at the same port, see examples in the `scripts` directory.
+Start Tailwind CSS processing by: `just tailwind`.

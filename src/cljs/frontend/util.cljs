@@ -35,28 +35,6 @@
         url (str "http://" host ":" port)]
     url))
 
-
-(defn header []
-  [:div.sf-header "Web Store"
-   (let [jwt @(re-frame/subscribe [::sf-state/jwt])
-         current-route @(re-frame/subscribe [::sf-state/current-route])]
-     #_(js/console.log "jwt: " jwt)
-     [:div
-      (if (and (= (:path current-route) "/") (not jwt))
-        [:button.sf-header-button
-         {:on-click #(re-frame/dispatch [::sf-state/navigate ::sf-state/signin])}
-         "Sign-In"])
-      (if (and (= (:path current-route) "/") (not jwt))
-        [:button.sf-header-button
-         {:on-click #(re-frame/dispatch [::sf-state/navigate ::sf-state/login])}
-         "Login"])
-      (if jwt
-        [:button.sf-header-button
-         {:on-click #(re-frame/dispatch [::sf-state/logout])}
-         "Logout"])])
-   [:div] ; Extra div so that we able to see the Sign-in and Login buttons with the 10x tool panel.
-   ])
-
 (defn debug-panel
   "Debug panel - you can use this panel in any view to show some page specific debug data."
   [data]
