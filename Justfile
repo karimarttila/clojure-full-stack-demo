@@ -23,7 +23,7 @@
   npm run dev
 
 @tailwind:
-  npx tailwindcss -i ./src/css/app.css -o ./resources/public/index.css --watch
+  npx tailwindcss -i ./src/css/app.css -o ./dev-resources/public/index.css --watch
 
 # Update dependencies.
 @outdated:
