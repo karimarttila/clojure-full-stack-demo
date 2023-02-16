@@ -1,5 +1,4 @@
-{
- ; Profile injected to Integrant.
+{; Profile injected to Integrant.
  :backend/profile #profile {:prod :prod
                             :dev :dev
                             :test :test}
@@ -9,15 +8,17 @@
                                         :dev 2000
                                         :test 5000}}}
 
+ :backend/csv {:profile #ig/ref :backend/profile
+               :data-dir "resources/data"}
+
+
  :backend/jetty {:port #profile {:dev #long #or [#env PORT 7171]
                                  :prod #long #or [#env PORT 7172]}
-                 :join? false
-                 }
+                 :join? false}
 
  :backend/nrepl {:bind #profile {:prod "0.0.0.0"
                                  :dev "localhost"}
                  :port #profile {:dev #long #or [#env PORT 7131]
-                                 :prod #long #or [#env PORT 7132]}}
- }
+                                 :prod #long #or [#env PORT 7132]}}}
 
 

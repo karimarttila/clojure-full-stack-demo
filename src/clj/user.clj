@@ -9,8 +9,7 @@
 
 (defn system [] (or state/system (throw (ex-info "System not running" {}))))
 
-(defn env [] (:backend/env (system)))
-;(defn service [] (:service (env)))
+(defn profile [] (:backend/profile (system)))
 
 (defn my-dummy-reset []
   (reset))

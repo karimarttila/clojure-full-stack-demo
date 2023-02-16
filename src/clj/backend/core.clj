@@ -9,6 +9,7 @@
    [integrant.core :as ig]
    [aero.core :as aero]
    [backend.webserver :as b-webserver]
+   [backend.domaindb.domain :as b-domain]
    [clojure.tools.reader.edn :as edn]
    [potpuri.core :as p]))
 
@@ -20,8 +21,16 @@
 (defmethod ig/init-key :backend/profile [_ profile]
   profile)
 
-(defmethod ig/init-key :backend/env [_ env]
-  env)
+(defn create-users []
+  [{:user-name "jartsa" :password "joo"}
+   {:user-name "rane" :password "jee"}
+   {:user-name "d" :password "d"}])
+
+(defmethod ig/init-key :backend/csv [_ {:keys [_profile data-dir]}]
+  (log/debug "ENTER ig/init-key :backend/csv")
+  {:db (atom {:domain (b-domain/get-domain-data data-dir)
+              :sessions #{}
+              :users (create-users)})})
 
 (defmethod ig/init-key :backend/jetty [_ {:keys [port join? env]}]
   (log/debug "ENTER ig/init-key :backend/jetty")
@@ -80,5 +89,10 @@
     (ig-repl/go)))
 
 (comment
-  (ig-repl/reset)
-  )
+  (ig-repl/reset))
+
+(comment
+  (user/system)
+  (user/profile)
+  (System/getenv)
+  (env-value :PATH :foo))

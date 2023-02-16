@@ -73,11 +73,15 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </logger>
-  <logger name="com.datomic" level="warn" additivity="false">
+  <logger name="io.undertow" level="warn" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </logger>
-  <logger name="datomic" level="warn" additivity="false">
+  <logger name="io.undertow" level="warn" additivity="false">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </logger>
+  <logger name="org.xnio" level="warn" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </logger>
