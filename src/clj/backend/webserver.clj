@@ -1,6 +1,7 @@
 (ns backend.webserver
   (:require [clojure.tools.logging :as log]
-            ;[clojure.string :as string]
+            [clojure.string :as string]
+            [clojure.data.codec.base64 :as base64]
             [ring.util.http-response :as ring-response]
             [reitit.ring :as reitit-ring]
             [reitit.coercion.malli]
@@ -13,8 +14,7 @@
             [reitit.ring.middleware.parameters :as reitit-parameters]
             [reitit.ring.middleware.dev]
             [muuntaja.core :as mu-core]
-            [backend.domaindb.users :as b-users]
-            ))
+            [backend.domaindb.users :as b-users]))
 
 
 (defn make-response [response-value]
@@ -41,7 +41,6 @@
     (ring-response/bad-request response-value)))
 
 
-
 (defn login
   "Provides API for login page."
   [env username password]
@@ -54,10 +53,22 @@
                          {:ret :failed :msg "Validation failed - some fields were empty"}
                          (if (not token)
                            {:ret :failed :msg "Login failed"}
-                           {:ret :ok :token token})
-                         )]
+                           {:ret :ok :token token}))]
     (make-response response-value)))
 
+
+(defn product-groups
+  "Gets product groups."
+  [env token]
+  (log/debug "ENTER -product-groups")
+  (let [token-ok (b-users/validate-token env token)
+        response-value (if token-ok
+                         (let [db (:db env)
+                               domain #p (:domain @db)
+                               product-groups (:product-groups domain)]
+                           {:ret :ok, :product-groups product-groups})
+                         {:ret :failed, :msg "Given token is not valid"})]
+    (make-response response-value)))
 
 ;; UI is in http://localhost:7171/index.html
 (defn routes
@@ -107,7 +118,14 @@
                                  (let [body (get-in req [:parameters :body])
                                        {:keys [username password]} body]
                                    (login env username password)))}}]
-    ]])
+    ["/product-groups" {:get {:summary "Get products groups"
+                              :responses {200 {:description "Product groups success"}}
+                              :parameters {:query [:map]}
+                              :handler (fn [req]
+                                         (let [token (get-in req [:headers "x-token"])]
+                                           (if (not token)
+                                             (make-response {:ret :failed, :msg "Token missing in request"})
+                                             (product-groups env token))))}}]]])
 
 ;; NOTE: If you want to check what middleware does you can uncomment rows 67-69 in:
 ;; https://github.com/metosin/reitit/blob/master/examples/ring-swagger/src/example/server.clj#L67-L69
@@ -184,7 +202,6 @@
    (str "https://reqres.in/api/users/2") {:debug true :accept "application/json"})
 
   (clj-http.client/get
-   (str "http://localhost:7171/info") {:debug true :accept "application/edn"})
-  )
+   (str "http://localhost:7171/info") {:debug true :accept "application/edn"}))
 
 

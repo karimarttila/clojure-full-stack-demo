@@ -1,11 +1,12 @@
 (ns backend.domaindb.users
   (:require [clojure.tools.logging :as log]
             [buddy.sign.jwt :as buddy-jwt]
+            [clojure.data.codec.base64 :as base64]
             [clj-time.core :as clj-time]))
 
 
 ;; Demonstration: For development purposes.
-;; (def my-atom (atom {}))
+(def my-atom (atom {}))
 #_(comment
     @my-atom
     (keys @my-atom)
@@ -49,7 +50,7 @@
   (let [db (:db env)]
     ;; First remove the old session, if exists.
     (let [old-session (first (filter (fn [s]
-                                       (and (= (:username s) (:username session)) 
+                                       (and (= (:username s) (:username session))
                                             (= (:password s) (:password session))))
                                      (:sessions @db)))]
       (when old-session
@@ -66,6 +67,45 @@
       (let [session {:username username :password password :token token}]
         (add-session env session)))
     token))
+
+
+(defn validate-token
+  [env token]
+  (log/debug (str "ENTER validate-token, token: " token))
+  (let [;_ (reset! my-atom token)
+        db (:db env)
+        session (first (filter (fn [s] (= (:token s) token))
+                               (:sessions @db)))]
+    ;; Part #1 of validation.
+    (if (nil? session)
+      (do
+        (log/warn (str "Token not found in the session database - unknown token: " token))
+        nil)
+      ;; Part #2 of validation.
+      (let [decoded-token (try
+                            (buddy-jwt/unsign token my-hex-secret)
+                            (catch Exception e
+                              (if (.contains (.getMessage e) "Token is expired")
+                                (do
+                                  (log/debug (str "Token is expired, removing it from my sessions and returning nil: " token))
+              ; TODO : remove token
+                                  nil)
+            ; Some other issue.
+                                (do
+                                  (log/error (str "Some unknown exception when handling expired token, exception: " (.getMessage e)) ", token: " token)
+                                  nil))))]
+        (if decoded-token
+          (if (= (:username session) (:username decoded-token))
+            decoded-token
+            (do
+              (log/error (str "Token username does not match the session username"))
+              nil))
+          nil)))))
+
+
+(comment
+  @my-atom
+  (buddy-jwt/unsign @my-atom my-hex-secret))
 
 
 (comment
