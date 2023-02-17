@@ -9,9 +9,9 @@
    (:current-route db)))
 
 (re-frame/reg-sub
- ::jwt
+ ::token
  (fn [db]
-   (:jwt db)))
+   (:token db)))
 
 (re-frame/reg-sub
  ::debug

@@ -10,10 +10,10 @@
             [reitit.frontend.easy :as rfe]
             [frontend.util :as f-util]
             [frontend.header :as f-header]
-            [frontend.signin :as f-signin]
+            [frontend.routes.index :as f-index]
             [frontend.state :as f-state]
-            ;; [frontend.login :as f-login]
-            ;; [frontend.product-group :as f-product-group]
+            [frontend.routes.login :as f-login]
+            [frontend.routes.product-groups :as f-product-group]
             ;; [frontend.products :as f-products]
             ;; [frontend.product :as f-product]
             ))
@@ -30,10 +30,11 @@
  ::initialize-db
  (fn [_ _]
    {:current-route nil
-    :jwt nil
+    :token nil
     :debug true
-    :login nil
-    :signin nil}))
+    :login-status nil
+    :user nil
+    }))
 
 (re-frame/reg-event-fx
  ::f-state/navigate
@@ -49,33 +50,29 @@
          controllers (rfc/apply-controllers (:controllers old-match) new-match)]
      (js/console.log (str "new-path: " new-path))
      (cond-> (assoc db :current-route (assoc new-match :controllers controllers))
-       (= "/" new-path) (-> (assoc :signin nil)
-                            (assoc :login nil))))))
+       (= "/" new-path) (->  (assoc :login-status nil)
+                             (assoc :user nil))))))
 
-(re-frame/reg-event-fx
+#_(re-frame/reg-event-fx
  ::f-state/logout
  (fn [cofx [_]]
-   {:db (assoc (:db cofx) :jwt nil)
+   {:db (assoc (:db cofx) :token nil)
     :fx [[:dispatch [::f-state/navigate ::f-state/home]]]}))
 
 ;;; Views ;;;
 
-(defn welcome []
-  [:div
-   [:h3 "Welcome!"]
-   [:p "Here you can browse books and movies."]
-   [:p "But you have to sign-in or login first!"]])
 
 (defn home-page []
-  (let [jwt @(re-frame/subscribe [::f-state/jwt])]
+  (let [token @(re-frame/subscribe [::f-state/token])]
     ; If we have jwt in app db we are logged-in.
     (f-util/clog "ENTER home-page")
-    (if jwt
+    [f-index/landing-page]
+    #_(if jwt
       (re-frame/dispatch [::f-state/navigate ::f-state/product-group])
       ;; NOTE: You need the div here or you are going to see only the debug-panel!
       [:div
        (welcome)
-       (f-util/debug-panel {:jwt jwt})])))
+       (f-util/debug-panel {:token token})])))
 
 
 ;;; Effects ;;;
@@ -107,40 +104,33 @@
      :controllers
      [{:start (fn [& params] (js/console.log (str "Entering home page, params: " params)))
        :stop (fn [& params] (js/console.log (str "Leaving home page, params: " params)))}]}]
-   ["signin"
-    {:name ::f-state/signin
-     :view f-signin/signin-page
-     :link-text "Sign-In"
-     :controllers
-     [{:start (fn [& params] (js/console.log (str "Entering signin, params: " params)))
-       :stop (fn [& params] (js/console.log (str "Leaving signin, params: " params)))}]}]
-   #_["login"
-    {:name ::f-state/login
-     :view f-login/login-page
-     :link-text "Login"
-     :controllers [{:start (fn [& params] (js/console.log (str "Entering login, params: " params)))
-                    :stop (fn [& params] (js/console.log (str "Leaving login, params: " params)))}]}]
-   #_["product-group"
-    {:name ::f-state/product-group
-     :view f-product-group/product-group-page
-     :link-text "Product group"
-     :controllers [{:start (fn [& params] (js/console.log (str "Entering product-group, params: " params)))
-                    :stop (fn [& params] (js/console.log (str "Leaving product-group, params: " params)))}]}]
+   ["login"
+      {:name ::f-state/login
+       :view f-login/login
+       :link-text "Login"
+       :controllers [{:start (fn [& params] (js/console.log (str "Entering login, params: " params)))
+                      :stop (fn [& params] (js/console.log (str "Leaving login, params: " params)))}]}]
+   ["product-group"
+      {:name ::f-state/product-groups
+       :view f-product-group/product-groups
+       :link-text "Product group"
+       :controllers [{:start (fn [& params] (js/console.log (str "Entering product-group, params: " params)))
+                      :stop (fn [& params] (js/console.log (str "Leaving product-group, params: " params)))}]}]
    #_["products/:pgid"
-    {:name ::f-state/products
-     :parameters {:path {:pgid int?}}
-     :view f-products/products-page
-     :link-text "Products"
-     :controllers [{:start (fn [& params] (js/console.log (str "Entering products, params: " params)))
-                    :stop (fn [& params] (js/console.log (str "Leaving products, params: " params)))}]}]
+      {:name ::f-state/products
+       :parameters {:path {:pgid int?}}
+       :view f-products/products-page
+       :link-text "Products"
+       :controllers [{:start (fn [& params] (js/console.log (str "Entering products, params: " params)))
+                      :stop (fn [& params] (js/console.log (str "Leaving products, params: " params)))}]}]
    #_["product/:pgid/:pid"
-    {:name ::f-state/product
-     :parameters {:path {:pgid int?
-                         :pid int?}}
-     :view f-product/product-page
-     :link-text "Product"
-     :controllers [{:start (fn [& params] (js/console.log (str "Entering product, params: " params)))
-                    :stop (fn [& params] (js/console.log (str "Leaving product, params: " params)))}]}]])
+      {:name ::f-state/product
+       :parameters {:path {:pgid int?
+                           :pid int?}}
+       :view f-product/product-page
+       :link-text "Product"
+       :controllers [{:start (fn [& params] (js/console.log (str "Entering product, params: " params)))
+                      :stop (fn [& params] (js/console.log (str "Leaving product, params: " params)))}]}]])
 
 (def routes routes-dev)
 
