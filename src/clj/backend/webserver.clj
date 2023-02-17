@@ -13,6 +13,7 @@
             [reitit.ring.middleware.parameters :as reitit-parameters]
             [reitit.ring.middleware.dev]
             [muuntaja.core :as mu-core]
+            [backend.domaindb.users :as b-users]
             ))
 
 
@@ -22,12 +23,49 @@
     (ring-response/bad-request response-value)))
 
 
-(defn -info
+(defn info
   "Gets the info."
   [_]
-  (log/debug "ENTER -info")
+  (log/debug "ENTER info")
   {:status 200 :body {:info "/info.html => Info in HTML format"}})
 
+(defn validate-parameters
+  "Extremely simple validator - just checks that all fields must have some value.
+  `field-values` - a list of fields to validate."
+  [field-values]
+  (every? #(seq %) field-values))
+
+(defn make-response [response-value]
+  (if (= (:ret response-value) :ok)
+    (ring-response/ok response-value)
+    (ring-response/bad-request response-value)))
+
+
+
+(defn login
+  "Provides API for login page."
+  [env username password]
+  (log/debug "ENTER login")
+  (let [validation-passed (validate-parameters [username password])
+        token (if validation-passed
+                (b-users/validate-user env username password)
+                nil)
+        #_#_credentials-ok (if validation-passed
+                         (b-users/check-password env username password)
+                         nil)
+        #_#_token (if credentials-ok
+                (ss-session-s/create-json-web-token env email)
+                nil)
+        #_#_response-value (if (not validation-passed)
+                             {:ret :failed, :msg "Validation failed - some fields were empty"}
+                             (if (not credentials-ok)
+                               {:ret :failed, :msg "Credentials are not good - either email or password is not correct"}
+                               (if (not json-web-token)
+                                 {:ret :failed, :msg "Internal error when creating the json web token"}
+                                 {:ret :ok, :msg "Credentials ok" :json-web-token json-web-token})))]
+    ;(make-response response-value)
+    token
+    ))
 
 ;; UI is in http://localhost:7171/index.html
 (defn routes
@@ -53,7 +91,7 @@
                     ; Don't allow any query parameters.
                     :parameters {:query [:map]}
                     :responses {200 {:description "Ping success"}}
-                    :handler (constantly (make-response {:ret :ok, :reply "pong"}))}
+                    :handler (constantly (make-response {:ret :ok, :reply "pong" :env env}))}
               :post {:summary "ping post"
                      :responses {200 {:description "Ping success"}}
                      ;; reitit adds mt/strip-extra-keys-transformer - probably changes in reitit 1.0,
@@ -67,7 +105,16 @@
     ["/info" {:get {:summary "Get info regarding the api"
                     :parameters {:query [:map]}
                     :responses {200 {:description "Info success"}}
-                    :handler (fn [{}] (-info env))}}]
+                    :handler (fn [{}] (info env))}}]
+    ["/login" {:post {:summary "Login to the web-store"
+                      :responses {200 {:description "Login success"}}
+                      :parameters {:body [:map
+                                          [:username string?]
+                                          [:password string?]]}
+                      :handler (fn [req]
+                                 (let [body (get-in req [:parameters :body])
+                                       {:keys [username password]} body]
+                                   (login env username password)))}}]
     ]])
 
 ;; NOTE: If you want to check what middleware does you can uncomment rows 67-69 in:

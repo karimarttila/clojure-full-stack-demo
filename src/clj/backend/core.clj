@@ -22,15 +22,30 @@
   profile)
 
 (defn create-users []
-  [{:user-name "jartsa" :password "joo"}
-   {:user-name "rane" :password "jee"}
-   {:user-name "d" :password "d"}])
+  [{:username "jartsa" :password "joo"}
+   {:username "rane" :password "jee"}
+   {:username "d" :password "d"}])
 
 (defmethod ig/init-key :backend/csv [_ {:keys [_profile data-dir]}]
   (log/debug "ENTER ig/init-key :backend/csv")
-  {:db (atom {:domain (b-domain/get-domain-data data-dir)
-              :sessions #{}
-              :users (create-users)})})
+  (atom {:domain (b-domain/get-domain-data data-dir)
+         :sessions #{}
+         :users (create-users)}))
+
+(defmethod ig/halt-key! :backend/csv [_ this]
+  (log/debug "ENTER ig/halt-key! :backend/csv")
+  this)
+
+(defmethod ig/suspend-key! :backend/csv [_ this]
+  (log/debug "ENTER ig/suspend-key! :backend/csv")
+  this)
+
+(defmethod ig/resume-key :backend/csv [_ _ _ old-impl]
+  (log/debug "ENTER ig/resume-key :backend/csv")
+  old-impl)
+
+(defmethod ig/init-key :backend/env [_ env]
+  env)
 
 (defmethod ig/init-key :backend/jetty [_ {:keys [port join? env]}]
   (log/debug "ENTER ig/init-key :backend/jetty")
@@ -88,11 +103,19 @@
     (ig-repl/set-prep! (constantly config))
     (ig-repl/go)))
 
-(comment
-  (ig-repl/reset))
 
 (comment
+  (ig-repl/reset)
   (user/system)
+  (keys (user/system))
+  (:backend/csv (user/system))
+  @(:backend/csv (user/system))
+  (keys @(:backend/csv (user/system)))
+  (type @(:backend/csv (user/system)))
+  (:users @(:backend/csv (user/system)))
+  (:users @(:backend/csv (user/system)))
+  (user/env)
   (user/profile)
   (System/getenv)
-  (env-value :PATH :foo))
+  (env-value :PATH :foo)
+  )
