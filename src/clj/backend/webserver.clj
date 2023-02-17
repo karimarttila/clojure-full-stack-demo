@@ -50,22 +50,14 @@
         token (if validation-passed
                 (b-users/validate-user env username password)
                 nil)
-        #_#_credentials-ok (if validation-passed
-                         (b-users/check-password env username password)
-                         nil)
-        #_#_token (if credentials-ok
-                (ss-session-s/create-json-web-token env email)
-                nil)
-        #_#_response-value (if (not validation-passed)
-                             {:ret :failed, :msg "Validation failed - some fields were empty"}
-                             (if (not credentials-ok)
-                               {:ret :failed, :msg "Credentials are not good - either email or password is not correct"}
-                               (if (not json-web-token)
-                                 {:ret :failed, :msg "Internal error when creating the json web token"}
-                                 {:ret :ok, :msg "Credentials ok" :json-web-token json-web-token})))]
-    ;(make-response response-value)
-    token
-    ))
+        response-value (if (not validation-passed)
+                         {:ret :failed :msg "Validation failed - some fields were empty"}
+                         (if (not token)
+                           {:ret :failed :msg "Login failed"}
+                           {:ret :ok :token token})
+                         )]
+    (make-response response-value)))
+
 
 ;; UI is in http://localhost:7171/index.html
 (defn routes
