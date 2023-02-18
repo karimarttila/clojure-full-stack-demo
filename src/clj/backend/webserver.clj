@@ -14,7 +14,7 @@
             [reitit.ring.middleware.parameters :as reitit-parameters]
             [reitit.ring.middleware.dev]
             [muuntaja.core :as mu-core]
-            [backend.domaindb.users :as b-users]))
+            [backend.db.users :as b-users]))
 
 
 (defn make-response [response-value]

@@ -1,4 +1,4 @@
-(ns backend.domaindb.domain
+(ns backend.db.domain
   "Loads the domain data from csv"
   (:require
    [clojure.tools.logging :as log]

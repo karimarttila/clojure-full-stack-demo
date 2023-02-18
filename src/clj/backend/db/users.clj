@@ -1,4 +1,4 @@
-(ns backend.domaindb.users
+(ns backend.db.users
   (:require [clojure.tools.logging :as log]
             [buddy.sign.jwt :as buddy-jwt]
             [clojure.data.codec.base64 :as base64]

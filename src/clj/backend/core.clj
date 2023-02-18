@@ -9,7 +9,7 @@
    [integrant.core :as ig]
    [aero.core :as aero]
    [backend.webserver :as b-webserver]
-   [backend.domaindb.domain :as b-domain]
+   [backend.db.domain :as b-domain]
    [clojure.tools.reader.edn :as edn]
    [potpuri.core :as p]))
 
