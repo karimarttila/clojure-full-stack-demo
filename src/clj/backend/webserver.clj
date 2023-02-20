@@ -64,11 +64,12 @@
   (let [token-ok (b-users/validate-token env token)
         response-value (if token-ok
                          (let [db (:db env)
-                               domain #p (:domain @db)
+                               domain (:domain @db)
                                product-groups (:product-groups domain)]
                            {:ret :ok, :product-groups product-groups})
                          {:ret :failed, :msg "Given token is not valid"})]
     (make-response response-value)))
+
 
 ;; UI is in http://localhost:7171/index.html
 (defn routes

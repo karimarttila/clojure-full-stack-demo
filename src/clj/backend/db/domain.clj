@@ -87,6 +87,9 @@
     {:product-groups product-groups
      :products products}))
 
+(defn get-product [pgId pId products]
+  (first (filter (fn [item] (and (= (:pgId item) pgId) (= (:pId item) pId))) products)))
+
 
 (comment
   (def my-data-dir "resources/data")
@@ -105,6 +108,11 @@
   (count (:products (get-domain-data "resources/data")))
   (get-product-groups "resources/data")
   (get-raw-products "resources/data" 1)
+  
+  (let [products (:products (get-domain-data "resources/data"))]
+    (first (filter (fn [item] (and (= (:pgId item) 2) (= (:pId item) 49))) products)))
+  
+  (get-product 2 49 (:products (get-domain-data "resources/data")))
   
   )
 

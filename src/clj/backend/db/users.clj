@@ -59,6 +59,20 @@
     (swap! db update-in [:sessions] conj session)))
 
 
+;; For testing purposes.
+(defn clear-sessions [env]
+  (log/debug (str "ENTER clear-sessions"))
+  (let [db (:db env)]
+    ;; Just reset :sessions key with an empty set.
+    (swap! db assoc :sessions #{})))
+
+;; For testing purposes.
+(defn get-sessions [env]
+  (log/debug (str "ENTER clear-sessions"))
+  (let [db (:db env)]
+    (:sessions @db)))
+
+
 (defn validate-user [env username password]
   (let [token (if (check-password env username password)
                 (generate-token env username)
@@ -113,6 +127,7 @@
   (:db (user/env))
   (keys @(:db (user/env)))
   (:users @(:db (user/env)))
+  (:sessions @(:db (user/env)))
   (def users (:users @(:db (user/env))))
   users
   (filter (fn [user]
@@ -154,4 +169,10 @@
 
 
   @mydb
-  (swap! mydb update-in [:sessions] disj session))
+  (swap! mydb update-in [:sessions] disj session)
+  
+  (get-sessions (user/env))
+  (add-session (user/env) {:token "jee"})
+  (clear-sessions (user/env))
+  
+  )

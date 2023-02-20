@@ -1,5 +1,5 @@
 ;; shadow-cljs configuration
-{:deps {:aliases [:dev :common :backend :frontend :kari :calva]}
+{:deps {:aliases [:dev :common :backend :frontend :test :kari :calva]}
  :dependencies []
  :builds {:app {:target :browser
                 :output-dir "dev-resources/public/js"

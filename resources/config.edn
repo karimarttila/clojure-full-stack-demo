@@ -8,14 +8,10 @@
                                         :dev 2000
                                         :test 5000}}}
 
- :backend/csv {:profile #ig/ref :backend/profile
-               :data-dir "resources/data"}
-
-
  :backend/env {:profile #ig/ref :backend/profile
-               ;; Simulate database. 
+               :data-dir "resources/data"
+              ;; Simulate database. 
                ;; In real life we should have the connection to the database here.
-               :db #ig/ref :backend/csv
                :options #ig/ref :backend/options}
 
  ;; This way we inject our world (env) to the API calls.

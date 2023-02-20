@@ -26,26 +26,24 @@
    {:username "rane" :password "jee"}
    {:username "d" :password "d"}])
 
-(defmethod ig/init-key :backend/csv [_ {:keys [_profile data-dir]}]
-  (log/debug "ENTER ig/init-key :backend/csv")
-  (atom {:domain (b-domain/get-domain-data data-dir)
-         :sessions #{}
-         :users (create-users)}))
+(defmethod ig/init-key :backend/env [_ {:keys [_profile data-dir] :as m}]
+  (log/debug "ENTER ig/init-key :backend/env")
+  ;; Simulates our database.
+  (conj m {:db (atom {:domain (b-domain/get-domain-data data-dir)
+                      :sessions #{}
+                      :users (create-users)})}))
 
-(defmethod ig/halt-key! :backend/csv [_ this]
-  (log/debug "ENTER ig/halt-key! :backend/csv")
+(defmethod ig/halt-key! :backend/env [_ this]
+  (log/debug "ENTER ig/halt-key! :backend/env")
   this)
 
-(defmethod ig/suspend-key! :backend/csv [_ this]
-  (log/debug "ENTER ig/suspend-key! :backend/csv")
+(defmethod ig/suspend-key! :backend/env [_ this]
+  (log/debug "ENTER ig/suspend-key! :backend/env")
   this)
 
-(defmethod ig/resume-key :backend/csv [_ _ _ old-impl]
-  (log/debug "ENTER ig/resume-key :backend/csv")
+(defmethod ig/resume-key :backend/env [_ _ _ old-impl]
+  (log/debug "ENTER ig/resume-key :backend/env")
   old-impl)
-
-(defmethod ig/init-key :backend/env [_ env]
-  env)
 
 (defmethod ig/init-key :backend/jetty [_ {:keys [port join? env]}]
   (log/debug "ENTER ig/init-key :backend/jetty")
@@ -106,14 +104,15 @@
 
 (comment
   (ig-repl/reset)
+  (ig-repl/halt)
   (user/system)
   (keys (user/system))
-  (:backend/csv (user/system))
-  @(:backend/csv (user/system))
-  (keys @(:backend/csv (user/system)))
-  (type @(:backend/csv (user/system)))
-  (:users @(:backend/csv (user/system)))
-  (:users @(:backend/csv (user/system)))
+  (:backend/env (user/system))
+  (keys (:backend/env (user/system)))
+  (keys @(:backend/env (user/system)))
+  (type @(:backend/env (user/system)))
+  (:users @(:backend/env (user/system)))
+  (:users @(:backend/env (user/system)))
   (user/env)
   (user/profile)
   (System/getenv)
