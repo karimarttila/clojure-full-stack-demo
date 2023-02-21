@@ -9,6 +9,9 @@
 @backend-calva-nrepl:
   clj -M:dev:test:common:backend:calva:kari -m nrepl.cmdline
 
+@backend-run-tests:
+  clj -M:dev:test:common:backend -m kaocha.runner
+
 # Init node packages.
 @init:
   mkdir -p target

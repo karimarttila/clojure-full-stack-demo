@@ -14,7 +14,8 @@
             [reitit.ring.middleware.parameters :as reitit-parameters]
             [reitit.ring.middleware.dev]
             [muuntaja.core :as mu-core]
-            [backend.db.users :as b-users]))
+            [backend.db.users :as b-users]
+            [backend.db.domain :as b-domain]))
 
 
 (defn make-response [response-value]
@@ -70,6 +71,34 @@
                          {:ret :failed, :msg "Given token is not valid"})]
     (make-response response-value)))
 
+(defn products
+  "Gets products."
+  [env token pg-id]
+  (log/debug "ENTER products")
+  (let [token-ok (b-users/validate-token env token)
+        response-value (if token-ok
+                         (let [db (:db env)
+                               domain (:domain @db)
+                               all-products (:products domain)
+                               pg-products (b-domain/get-products pg-id all-products)]
+                           {:ret :ok, :pgId pg-id :products pg-products})
+                         {:ret :failed, :msg "Given token is not valid"})]
+    (make-response response-value)))
+
+
+(defn product
+  "Gets product."
+  [env token pg-id p-id]
+  (log/debug "ENTER product")
+  (let [token-ok (b-users/validate-token env token)
+        response-value (if token-ok
+                         (let [db (:db env)
+                               domain (:domain @db)
+                               all-products (:products domain)
+                               my-product (b-domain/get-product pg-id p-id all-products)]
+                           {:ret :ok, :pgId pg-id :pId p-id :product my-product})
+                         {:ret :failed, :msg "Given token is not valid"})]
+    (make-response response-value)))
 
 ;; UI is in http://localhost:7171/index.html
 (defn routes
@@ -126,7 +155,28 @@
                                          (let [token (get-in req [:headers "x-token"])]
                                            (if (not token)
                                              (make-response {:ret :failed, :msg "Token missing in request"})
-                                             (product-groups env token))))}}]]])
+                                             (product-groups env token))))}}]
+    ["/products/:pg-id" {:get {:summary "Get products"
+                               :responses {200 {:description "Products success"}}
+                               :parameters {:query [:map]
+                                            :path [:map [:pg-id string?]]}
+                               :handler (fn [req]
+                                          (let [token (get-in req [:headers "x-token"])
+                                                pg-id (Integer/parseInt (get-in req [:parameters :path :pg-id]))]
+                                            (if (not token)
+                                              (make-response {:ret :failed, :msg "Token missing in request"})
+                                              (products env token pg-id))))}}]
+    ["/product/:pg-id/:p-id" {:get {:summary "Get product"
+                                    :responses {200 {:description "Product success"}}
+                                    :parameters {:query [:map]
+                                                 :path [:map [:pg-id string?] [:p-id string?]]}
+                                    :handler (fn [req]
+                                               (let [token (get-in req [:headers "x-token"])
+                                                     pg-id (Integer/parseInt (get-in req [:parameters :path :pg-id]))
+                                                     p-id (Integer/parseInt (get-in req [:parameters :path :p-id]))]
+                                                 (if (not token)
+                                                   (make-response {:ret :failed, :msg "Token missing in request"})
+                                                   (product env token pg-id p-id))))}}]]])
 
 ;; NOTE: If you want to check what middleware does you can uncomment rows 67-69 in:
 ;; https://github.com/metosin/reitit/blob/master/examples/ring-swagger/src/example/server.clj#L67-L69

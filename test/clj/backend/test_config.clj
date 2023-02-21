@@ -57,7 +57,7 @@
     (finally
       (halt))))
 
-(defn -call-api [verb path headers body]
+(defn call-api [verb path headers body]
   (let [my-port (-> @test-system :backend/jetty .getConnectors first .getPort)
         my-fn (cond
                 (= verb :get) http-client/get

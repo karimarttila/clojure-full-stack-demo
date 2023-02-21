@@ -87,11 +87,28 @@
     {:product-groups product-groups
      :products products}))
 
-(defn get-product [pgId pId products]
-  (first (filter (fn [item] (and (= (:pgId item) pgId) (= (:pId item) pId))) products)))
+
+;(def my-atom (atom nil))
+
+
+(defn get-products [pg-id products]
+  (let [;_ (reset! my-atom products)
+        ]
+    (filter (fn [item] (= (:pgId item) pg-id)) products)))
+
+
+(defn get-product [pg-id p-id products]
+  (first (filter (fn [item] (and (= (:pgId item) pg-id) (= (:pId item) p-id))) products)))
+
+
 
 
 (comment
+  ;; (count @my-atom)
+  ;; (count (filter (fn [item] (= (:pgId item) 1)) @my-atom))
+  ;; (count (get-products 1 @my-atom))
+  
+  
   (def my-data-dir "resources/data")
   (def my-product-groups (get-product-groups my-data-dir))
   my-product-groups

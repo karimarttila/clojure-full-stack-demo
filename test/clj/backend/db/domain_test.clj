@@ -33,12 +33,12 @@
         (let [product-groups (:product-groups domain-data)
               product-groups-len (count product-groups)
               right-vec [{:pgId 1, :name "Books"} {:pgId 2, :name "Movies"}]]
-          (is (= product-groups-len 2))
-          (is (= product-groups right-vec))))
+          (is (= 2 product-groups-len))
+          (is (= right-vec product-groups))))
       (testing "Testing products"
         (let [products (:products domain-data)
               products-len (count products)]
-          (is (= products-len 204))))
+          (is (= 204 products-len))))
       (testing "Testing specific product"
         (let [products (:products domain-data)
               product (b-domain/get-product 2 49 products)
@@ -50,19 +50,26 @@
                              :year 1968,
                              :country "Italy-USA",
                              :genre "Western"}]
-          (is (= product right-product))))))
+          (is (= right-product product))))))
   (testing "Using the domain data in the internal test system"
     (let [domain-data (:domain @(-> @test-config/test-system :backend/env :db))]
       (testing "Testing product groups"
         (let [product-groups (:product-groups domain-data)
               product-groups-len (count product-groups)
               right-vec [{:pgId 1, :name "Books"} {:pgId 2, :name "Movies"}]]
-          (is (= product-groups-len 2))
-          (is (= product-groups right-vec))))
+          (is (= 2 product-groups-len))
+          (is (= right-vec product-groups))))
       (testing "Testing products"
         (let [products (:products domain-data)
               products-len (count products)]
-          (is (= products-len 204))))
+          (is (= 204 products-len))))
+      (testing "Testing products of a specific product group"
+        (let [products (:products domain-data)
+              products-1 (b-domain/get-products 1 products)
+              products-2 (b-domain/get-products 2 products)]
+          (is (= 35 (count products-1)))
+          (is (= 169 (count products-2)))
+          (is (= 204 (+ (count products-1) (count products-2))))))
       (testing "Testing specific product"
         (let [products (:products domain-data)
               product (b-domain/get-product 2 49 products)
@@ -74,7 +81,7 @@
                              :year 1968,
                              :country "Italy-USA",
                              :genre "Western"}]
-          (is (= product right-product))))))
+          (is (= right-product product))))))
   
   )
 

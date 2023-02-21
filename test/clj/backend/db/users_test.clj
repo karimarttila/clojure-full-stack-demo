@@ -31,31 +31,31 @@
       (is (= (count (b-users/get-sessions env)) 0))
       (let [token-jartsa (b-users/validate-user env "jartsa" "joo")]
         (is (not (nil? token-jartsa)))
-        (let [decoded-token #p (b-users/validate-token env token-jartsa)]
+        (let [decoded-token (b-users/validate-token env token-jartsa)]
           (is (not (nil? token-jartsa)))
-          (is (= (:username decoded-token) "jartsa"))
+          (is (= "jartsa" (:username decoded-token)))
           (let [sessions (b-users/get-sessions env)
                 session (first sessions)]
-            (is (= (count sessions) 1))
-            (is (= (:username session) "jartsa"))
-            (is (= (:password session) "joo"))
-            (is (= (:token session) token-jartsa))))
+            (is (= 1 (count sessions)))
+            (is (= "jartsa" (:username session)))
+            (is (= "joo" (:password session)))
+            (is (= token-jartsa (:token session)))))
         (let [_token-rane (b-users/validate-user env "rane" "jee")]
           (let [sessions (b-users/get-sessions env)]
-            (is (= (count sessions) 2))))
+            (is (= 2 (count sessions)))))
         ;; Create a new session for jartsa: the old one should be removed
         (let [token-jartsa2 (b-users/validate-user env "jartsa" "joo")]
           (is (not (nil? token-jartsa2)))
           (let [sessions (b-users/get-sessions env)]
-            (is (= (count sessions) 2))))))))
+            (is (= 2 (count sessions)))))))))
 
 (deftest user-validation-fails-test
   (log/debug "ENTER user-validation-fails-test")
   (testing "User validation fails"
     (let [env (:backend/env @test-config/test-system)]
       (b-users/clear-sessions env)
-      (is (= (count (b-users/get-sessions env)) 0))
+      (is (= 0 (count (b-users/get-sessions env))))
       (let [token-jartsa (b-users/validate-user env "jartsa" "WRONG")]
         (is (nil? token-jartsa))
         (let [sessions (b-users/get-sessions env)]
-          (is (= (count sessions) 0)))))))
+          (is (= 0 (count sessions))))))))
