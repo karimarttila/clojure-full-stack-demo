@@ -20,13 +20,17 @@
 (defn input
   "Input field component for e.g. First name, Last name, Email address and Password."
   [label k type state]
-  [:div
-   [:label.sf-label label]
-   [:input.sf-input {:id (name k)
-                     :name (name k)
-                     :type type
-                     :value (k @state)
-                     :on-change (save! state k)}]])
+  [:div.flex.flex-wrap.gap-2.items-center.mt-1
+   [:label {:htmlFor (name k) :className "login-label"} label]
+   [:div
+    [:input {:type "text"
+             :id (name k)
+             :name (name k)
+             :className "login-input"
+             :placeholder (name k)
+             :value (k @state)
+             :on-change (save! state k)
+             :required true}]]])
 
 (defn get-base-url
   []
@@ -54,3 +58,13 @@
                (str msg ": " data)
                msg)]
      (js/console.log buf))))
+
+
+(defn error-message
+  [title msg]
+  [:<>
+   [:div.bg-red-100.border.border-red-400.text-red-700.px-4.py-3.rounded.relative
+    {:role "alert"}
+    [:strong.font-bold.mr-2 title]
+    [:span.block.sm:inline msg]]]) 
+  

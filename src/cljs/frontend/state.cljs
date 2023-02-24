@@ -14,6 +14,16 @@
    (:token db)))
 
 (re-frame/reg-sub
+ ::username
+ (fn [db]
+   (:username db)))
+
+(re-frame/reg-sub
+ ::login-status
+ (fn [db]
+   (:login-status db)))
+
+(re-frame/reg-sub
  ::debug
  (fn [db]
    (:debug db)))

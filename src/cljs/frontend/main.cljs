@@ -33,7 +33,7 @@
     :token nil
     :debug true
     :login-status nil
-    :user nil
+    :username nil
     }))
 
 (re-frame/reg-event-fx
@@ -52,6 +52,17 @@
      (cond-> (assoc db :current-route (assoc new-match :controllers controllers))
        (= "/" new-path) (->  (assoc :login-status nil)
                              (assoc :user nil))))))
+
+(re-frame/reg-event-fx
+ ::f-state/logout
+ (fn [cofx [_]]
+   (let [db (:db cofx)]
+     {:db (-> db
+              (assoc-in [:login] nil)
+              (assoc-in [:username] nil)
+              (assoc-in [:login-status] nil)
+              (assoc-in [:token] nil))
+      :fx [[:dispatch [::f-state/navigate ::f-state/login]]]})))
 
 #_(re-frame/reg-event-fx
  ::f-state/logout
