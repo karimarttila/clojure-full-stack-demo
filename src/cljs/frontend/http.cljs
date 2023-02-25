@@ -1,36 +1,11 @@
 (ns frontend.http
   (:require [frontend.util :as f-util]
-            [goog.crypt.base64 :as base64]
             [ajax.core :as ajax :refer []])) ; NOTE: Empty refer for clj-kondo
 
-(defn -base64-encode
-  "Does the base64 encoding for the string"
-  [str]
-  (base64/encodeString str false))
-
-
-(defn -encode-token
-  "Encodes the token to be used for pages"
-  [jwt]
-  (str "Basic " (-base64-encode (str jwt))))
-
-
-(defn get-jwt [db]
-  (let [jwt (get-in db [:jwt])
-        ret (if jwt
-              (-encode-token jwt)
-              nil)
-        _ (f-util/clog "auth-header, ret: " ret)]
-    ret))
-
-; TODO: How to use EDN in request and response bodys?
-; Now for some reason we get edn response with 200 status just fine but
-; e.g. login goes to error handler.
-; [:Accept "application/edn" :Content-Type "application/edn"]
 (defn get-headers [db]
-  (let [jwt (get-jwt db)
+  (let [token (get-in db [:token])
         ret (cond-> {:Accept "application/json" :Content-Type "application/json"}
-              jwt (assoc :Authorization jwt))
+              token (assoc :x-token token))
         _ (f-util/clog "get-headers, ret" ret)]
     ret))
 

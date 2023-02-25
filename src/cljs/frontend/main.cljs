@@ -14,7 +14,7 @@
             [frontend.state :as f-state]
             [frontend.routes.login :as f-login]
             [frontend.routes.product-groups :as f-product-group]
-            ;; [frontend.products :as f-products]
+            [frontend.routes.products :as f-products]
             ;; [frontend.product :as f-product]
             ))
 
@@ -127,10 +127,10 @@
        :link-text "Product group"
        :controllers [{:start (fn [& params] (js/console.log (str "Entering product-group, params: " params)))
                       :stop (fn [& params] (js/console.log (str "Leaving product-group, params: " params)))}]}]
-   #_["products/:pgid"
+   ["products/:pgid"
       {:name ::f-state/products
        :parameters {:path {:pgid int?}}
-       :view f-products/products-page
+       :view f-products/products
        :link-text "Products"
        :controllers [{:start (fn [& params] (js/console.log (str "Entering products, params: " params)))
                       :stop (fn [& params] (js/console.log (str "Leaving products, params: " params)))}]}]

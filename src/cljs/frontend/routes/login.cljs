@@ -62,19 +62,19 @@
           (when (= ret :failed)
             [:div {:className "flex grow w-3/4 p-4"}
              (re-frame/dispatch [::save-username nil])
-             (f-util/error-message "Login failed!" "Username or password is wrong.")])]
+             [f-util/error-message "Login failed!" "Username or password is wrong."]])]
          [:div.flex.grow.justify-center.items-center
           [:div {:className "flex grow w-1/2 p-4"}
            [:form
             [:div.mt-3
-             (f-util/input "Username" :username "text" login-data)
-             (f-util/input "Password" :password "password" login-data)]
-            [:div.flex.flex-col.justify-center.items-center.mt-5
-             [:button {:className "login-button"
-                       :on-click (fn [e]
-                                   (.preventDefault e)
-                                   (re-frame/dispatch [::login-user @login-data])
-                                   (re-frame/dispatch [::save-username (:username @login-data)])
-                                   )}
-              "Login"]]]]]]))))
+             [f-util/input "Username" :username "text" login-data]
+             [f-util/input "Password" :password "password" login-data]
+             [:div.flex.flex-col.justify-center.items-center.mt-5
+              [:button {:className "login-button"
+                        :on-click (fn [e]
+                                    (.preventDefault e)
+                                    (re-frame/dispatch [::login-user @login-data])
+                                    (re-frame/dispatch [::save-username (:username @login-data)])
+                                    )}
+               "Login"]]]]]]]))))
 
