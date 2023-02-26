@@ -46,12 +46,20 @@
                            (get-in db [:product-groups :data])))))))
 
 
+;; We could just get the specific product from re-frame :products key,
+;; but let's fetch it using the backend API.
 (re-frame/reg-event-fx
  ::get-products
  (fn [{:keys [db]} [_ pg-id]]
    (f-util/clog "get-product, pg-id" pg-id)
    (f-http/http-get db (str "/api/products/" pg-id) nil ::ret-ok ::ret-failed)))
 
+
+(re-frame/reg-event-db
+ ::reset-product
+ (fn [db param]
+   (f-util/clog "reg-event-db reset-product" param)
+   (assoc-in db [:product] nil)))
 
 (defn products-table [data]
   [:table
@@ -78,7 +86,9 @@
         _ (f-util/clog "path" path)
         _ (f-util/clog "pgid" pgid)]
     (fn []
-      (let [login-status @(re-frame/subscribe [::f-state/login-status])
+      (let [;; Reset product so that we are forced to fetch the new product in the product page.
+            _ (re-frame/dispatch [::reset-product])
+            login-status @(re-frame/subscribe [::f-state/login-status])
             token @(re-frame/subscribe [::f-state/token])
             _ (when-not (and login-status token) (re-frame/dispatch [::f-state/navigate ::f-state/login]))
             data @(re-frame/subscribe [::products-data pgid])

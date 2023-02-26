@@ -7,21 +7,6 @@
    [frontend.util :as f-util]))
 
 
-(defn product-table [data titles]
-  (let [table-values (map list titles data)]
-    [:table.f-table
-     [:thead
-      [:tr
-       [:th "Header"]
-       [:th "Product"]]]
-     [:tbody
-      (map (fn [item]
-             (let [[field value] item]
-               [:tr {:key field}
-                [:td field]
-                [:td value]]))
-           table-values)]]))
-
 (re-frame/reg-event-db
  ::ret-ok
  (fn [db [_ res-body]]
@@ -30,7 +15,8 @@
          pid (:p-id res-body)]
      (-> db
          (assoc-in [:product :response] {:ret :ok :res-body res-body})
-         (assoc-in [:product :data pgid pid] (:product res-body))))))
+         (assoc-in [:product :data] (:product res-body))))))
+
 
 (re-frame/reg-event-db
  ::ret-failed
@@ -39,15 +25,14 @@
    (assoc-in db [:product :response] {:ret :failed
                                       :msg (get-in res-body [:response :msg])})))
 
+
 (re-frame/reg-sub
  ::product-data
  (fn [db params]
    (f-util/clog "::product-data, params" params)
-   (let [pgid (nth params 1)
-         pid (nth params 2)
-         data (get-in db [:product :data])
-         _ (f-util/clog "product-data" data)]
-     (get-in data [pgid pid]))))
+   (let [data (get-in db [:product :data]) ]
+     data)))
+
 
 (re-frame/reg-event-fx
  ::get-product
@@ -56,11 +41,25 @@
    (f-http/http-get db (str "/api/product/" pg-id "/" p-id) nil ::ret-ok ::ret-failed)))
 
 
+(defn product-table [data]
+  [:table
+   [:thead
+    [:tr
+     [:th "Field"]
+     [:th "Value"]]]
+   [:tbody
+    (map (fn [item]
+           (let [[field value] item]
+             [:tr {:key field}
+              [:td field]
+              [:td value]]))
+         data)]])
+
+
 (defn product
   "Product view."
   [match]
-  [:p "TODO PRODUCT"]
-  #_ (let [_ (f-util/clog "ENTER product-page, match" match)
+   (let [_ (f-util/clog "ENTER product-page, match" match)
            {:keys [path]} (:parameters match)
            {:keys [pgid pid]} path
            pgid (str pgid)
@@ -70,26 +69,15 @@
            _ (f-util/clog "pid" pid)]
 
        (fn []
-         (let [titles (if (= pgid "1")
-                        ["Id" "Pg-Id" "Name" "Price" "Author" "Year" "Country" "Language"] ; Book
-                        ["Id" "Pg-Id" "Name" "Price" "Director" "Year" "Country" "Category"] ; Movie
-                        )
-               product-data @(re-frame/subscribe [::product-data pgid pid])
-               _ (if-not product-data (re-frame/dispatch [::get-product pgid pid]))]
-           [:div
-            [:h3 "Product "]
-            [:div.f-pg-container
-             (product-table product-data titles)]
-            [:div
-             [:button.f-basic-button
-              {:on-click (fn [e]
-                           (.preventDefault e)
-                           (re-frame/dispatch [::f-state/navigate ::f-state/products {:pgid pgid}]))}
-              "Back to Products"]
-             [:button.f-basic-button
-              {:on-click (fn [e]
-                           (.preventDefault e)
-                           (re-frame/dispatch [::f-state/navigate ::f-state/home]))}
-              "Go to home"]]
-            (f-util/debug-panel {:product-data product-data})]))))
+         (let [title "Product"
+               login-status @(re-frame/subscribe [::f-state/login-status])
+               token @(re-frame/subscribe [::f-state/token])
+               _ (when-not (and login-status token) (re-frame/dispatch [::f-state/navigate ::f-state/login]))
+               data @(re-frame/subscribe [::product-data pgid pid])
+               _ (when-not data (re-frame/dispatch [::get-product pgid pid]))]
+           [:div.app
+            [:div.p-4
+             [:p.text-left.text-lg.font-bold.p-4 title]
+             [:div.p-4
+              [product-table data]]]]))))
 

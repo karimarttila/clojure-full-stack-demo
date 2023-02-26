@@ -37,6 +37,7 @@
     :username nil
     :product-groups nil
     :products nil
+    :product nil
     }))
 
 (re-frame/reg-event-fx
