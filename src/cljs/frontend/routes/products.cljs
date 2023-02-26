@@ -8,6 +8,66 @@
    [frontend.util :as f-util]))
 
 
+(re-frame/reg-event-db
+ ::ret-ok
+ (fn [db [_ res-body]]
+   (f-util/clog "reg-event-db")
+   (let [pg-id (:pgId res-body)]
+     (-> db
+         (assoc-in [:products :response] {:ret :ok :res-body res-body})
+         (assoc-in [:products :data pg-id] (:products res-body))))))
+
+(re-frame/reg-event-db
+ ::ret-failed
+ (fn [db [_ res-body]]
+   (f-util/clog "reg-event-db failed" db)
+   (assoc-in db [:products :response] {:ret :failed
+                                       :msg (get-in res-body [:response :msg])})))
+
+(re-frame/reg-sub
+ ::products-data
+ (fn [db params]
+   (f-util/clog "::products-data")
+   (f-util/clog "params: " params)
+   (let [myParseInt (fn [s] (js/parseInt s 10))
+         pgid (f-util/myParseInt (second params))
+         data (get-in db [:products :data])]
+     (get-in data [pgid]))))
+
+
+
+(re-frame/reg-sub
+ ::product-group-name
+ (fn [db params]
+   (f-util/clog "::product-group-name, params" params)
+   (let [pg-id (f-util/myParseInt (second params))]
+     (:name (first (filter (fn [item]
+                             (= pg-id (:pgId item)))
+                           (get-in db [:product-groups :data])))))))
+
+
+(re-frame/reg-event-fx
+ ::get-products
+ (fn [{:keys [db]} [_ pg-id]]
+   (f-util/clog "get-product, pg-id" pg-id)
+   (f-http/http-get db (str "/api/products/" pg-id) nil ::ret-ok ::ret-failed)))
+
+
+(defn products-table [data]
+  [:table
+   [:thead
+    [:tr
+     [:th "Id"]
+     [:th "Name"]]]
+   [:tbody
+    (map (fn [item]
+           (let [{pg-id :pgId p-id :pId title :title} item]
+             [:tr {:key p-id}
+              [:td [:a {:href (rfe/href ::f-state/product {:pgid pg-id :pid p-id})} p-id]]
+              [:td title]]))
+         data)]])
+
+
 (defn products
   "Products view."
   [match] ; NOTE: This is the current-route given as parameter to the view. You can get the pgid also from :path-params.
@@ -18,19 +78,17 @@
         _ (f-util/clog "path" path)
         _ (f-util/clog "pgid" pgid)]
     (fn []
-      (let [
-            ;; products-data @(re-frame/subscribe [::products-data pgid])
-            ;; product-group-name @(re-frame/subscribe [::product-group-name pgid])
-            ;; _ (if-not products-data (re-frame/dispatch [::get-products pgid]))
-            ]
-        [:div
-         [:h3 "Products - " #_product-group-name]
-         #_[:div.f-pg-container
-          (products-table products-data)]
-         #_[:div
-          [:button.f-basic-button
-           {:on-click (fn [e]
-                        (.preventDefault e)
-                        (re-frame/dispatch [::f-state/navigate ::f-state/home]))}
-           "Go to home"]]
-         #_(f-util/debug-panel {:products-data products-data})]))))
+      (let [login-status @(re-frame/subscribe [::f-state/login-status])
+            token @(re-frame/subscribe [::f-state/token])
+            _ (when-not (and login-status token) (re-frame/dispatch [::f-state/navigate ::f-state/login]))
+            data @(re-frame/subscribe [::products-data pgid])
+            product-group-name @(re-frame/subscribe [::product-group-name pgid])
+            title (str "Products - " product-group-name)
+            _ (when-not data (re-frame/dispatch [::get-products pgid]))]
+        [:div.app
+         [:div.p-4
+          [:p.text-left.text-lg.font-bold.p-4 title]
+          [:div.p-4
+           [products-table data]]]]))))
+
+

@@ -39,21 +39,19 @@
 (defn product-groups-simple-table 
   [data]
   (let [_ (f-util/clog "ENTER product-groups-table")]
-    (fn []
-      (let [_ (f-util/clog data)]
-        [:div.p-4
-         [:table
-          [:thead
-           [:tr
-            [:th "Id"]
-            [:th "Name"]]]
-          [:tbody
-           (map (fn [item]
-                  (let [{pg-id :pgId pg-name :name} item]
-                    [:tr {:key pg-id}
-                     [:td [:a {:href (rfe/href ::f-state/products {:pgid pg-id})} pg-id]]
-                     [:td pg-name]]))
-                data)]]]))))
+    [:div.p-4
+     [:table
+      [:thead
+       [:tr
+        [:th "Id"]
+        [:th "Name"]]]
+      [:tbody
+       (map (fn [item]
+              (let [{pg-id :pgId pg-name :name} item]
+                [:tr {:key pg-id}
+                 [:td [:a {:href (rfe/href ::f-state/products {:pgid pg-id})} pg-id]]
+                 [:td pg-name]]))
+            data)]]]))
 
 
 (defn product-groups []
@@ -62,9 +60,9 @@
       (let [title " Product Groups"
             login-status @(re-frame/subscribe [::f-state/login-status])
             token @(re-frame/subscribe [::f-state/token])
-            _ (if-not (and login-status token) (re-frame/dispatch [::f-state/navigate ::f-state/login]))
+            _ (when-not (and login-status token) (re-frame/dispatch [::f-state/navigate ::f-state/login]))
             product-groups-data @(re-frame/subscribe [::product-groups-data])
-            _ (if-not product-groups-data (re-frame/dispatch [::get-product-groups]))
+            _ (when-not product-groups-data (re-frame/dispatch [::get-product-groups]))
             ]
         [:div.app
          [:div.p-4

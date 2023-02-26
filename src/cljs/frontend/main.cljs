@@ -15,7 +15,7 @@
             [frontend.routes.login :as f-login]
             [frontend.routes.product-groups :as f-product-group]
             [frontend.routes.products :as f-products]
-            ;; [frontend.product :as f-product]
+            [frontend.routes.product :as f-product]
             ))
 
 ;; ******************************************************************
@@ -26,6 +26,7 @@
 
 ;;; Events ;;;
 
+
 (re-frame/reg-event-db
  ::initialize-db
  (fn [_ _]
@@ -34,6 +35,8 @@
     :debug true
     :login-status nil
     :username nil
+    :product-groups nil
+    :products nil
     }))
 
 (re-frame/reg-event-fx
@@ -134,11 +137,11 @@
        :link-text "Products"
        :controllers [{:start (fn [& params] (js/console.log (str "Entering products, params: " params)))
                       :stop (fn [& params] (js/console.log (str "Leaving products, params: " params)))}]}]
-   #_["product/:pgid/:pid"
+   ["product/:pgid/:pid"
       {:name ::f-state/product
        :parameters {:path {:pgid int?
                            :pid int?}}
-       :view f-product/product-page
+       :view f-product/product
        :link-text "Product"
        :controllers [{:start (fn [& params] (js/console.log (str "Entering product, params: " params)))
                       :stop (fn [& params] (js/console.log (str "Leaving product, params: " params)))}]}]])
