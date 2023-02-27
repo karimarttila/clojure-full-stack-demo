@@ -1,7 +1,8 @@
 (ns frontend.routes.product-groups
   (:require [re-frame.core :as re-frame]
             [reitit.frontend.easy :as rfe]
-            ;["@tanstack/react-table" :as rt]
+            ["@tanstack/react-table" :as rt]
+            ["react" :as react :default useMemo]
             [frontend.state :as f-state]
             [frontend.http :as f-http]
             [frontend.util :as f-util]))
@@ -36,7 +37,7 @@
 
 ;; Let's implement a simple basic html table first, 
 ;; and later provide an example using @tanstack/react-table.
-(defn product-groups-simple-table 
+(defn product-groups-simple-table
   [data]
   (let [_ (f-util/clog "ENTER product-groups-table")]
     [:div.p-4
@@ -53,6 +54,32 @@
                  [:td pg-name]]))
             data)]]]))
 
+;; Example of Clojurescript / Javascript interop.
+(defn product-groups-react-table
+  [data]
+  (let [_ (f-util/clog "ENTER product-groups-table") 
+        columnHelper (rt/createColumnHelper)
+        columns #js [ (.accessor columnHelper "pgId" #js {:header "Id" :cell (fn [info] (.getValue info) )})
+                     (.accessor columnHelper "name" #js {:header "Name" :cell (fn [info] (.getValue info))})]
+        table (rt/useReactTable #js {:columns columns :data (clj->js data) :getCoreRowModel (rt/getCoreRowModel)})
+        ^js headerGroups (.getHeaderGroups table)]
+    [:div.p-4
+     [:table
+      [:thead
+       (for [^js headerGroup headerGroups]
+         [:tr {:key (.-id headerGroup) }
+          (for [^js header (.-headers headerGroup)]
+            [:th {:key (.-id header) }
+             (if (.-isPlaceholder header)
+               nil
+               (rt/flexRender (.. header -column -columnDef -header) (.getContext header)))])])]
+      [:tbody
+       (for [^js row (.-rows (.getRowModel table))]
+         [:tr {:key (.-id row)}
+          (for [^js cell (.getVisibleCells row)]
+            [:td {:key (.-id cell)}
+             (rt/flexRender (.. cell -column -columnDef -cell) (.getContext cell))])])]]]))
+
 
 (defn product-groups []
   (let [_ (f-util/clog "ENTER product-groups")]
@@ -68,5 +95,7 @@
          [:div.p-4
           [:p.text-left.text-lg.font-bold.p-4 title]
           [:div.p-4
-           [product-groups-simple-table product-groups-data]]]]))))
+           ;[product-groups-simple-table product-groups-data]
+           [:f> product-groups-react-table product-groups-data]
+           ]]]))))
 
