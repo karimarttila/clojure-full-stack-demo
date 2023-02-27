@@ -54,12 +54,22 @@
                  [:td pg-name]]))
             data)]]]))
 
+
+;; TODO: The hyperlink does not work for some reason.
+(defn mylink 
+  [pg-id]
+  [:<>
+   [:a {:href (rfe/href ::f-state/products {:pgid pg-id})} pg-id]])
+
+
 ;; Example of Clojurescript / Javascript interop.
+;; Compare to equivalent JSX implementation: 
+;; https://github.com/karimarttila/js-node-ts-react/blob/main/frontend/src/routes/product_groups.tsx#L36
 (defn product-groups-react-table
   [data]
   (let [_ (f-util/clog "ENTER product-groups-table") 
         columnHelper (rt/createColumnHelper)
-        columns #js [ (.accessor columnHelper "pgId" #js {:header "Id" :cell (fn [info] (.getValue info) )})
+        columns #js [(.accessor columnHelper "pgId" #js {:header "Id" :cell (fn [info] [mylink (.getValue info)])})
                      (.accessor columnHelper "name" #js {:header "Name" :cell (fn [info] (.getValue info))})]
         table (rt/useReactTable #js {:columns columns :data (clj->js data) :getCoreRowModel (rt/getCoreRowModel)})
         ^js headerGroups (.getHeaderGroups table)]
