@@ -23,6 +23,9 @@
 # Then in Calva give command: `Calva: Connect to a running REPL Server in the Project`. 
 # Then choose: `backend + frontend`.
 @frontend:
+  rm -rf dev-resources
+  mkdir -p dev-resources/public/js
+  npx tailwindcss -i ./src/css/app.css -o ./dev-resources/public/index.css
   npm run dev
 
 @tailwind:
@@ -56,9 +59,7 @@
     rm -rf .cpcache/*
     rm -rf .shadow-cljs/*
     rm -rf target/*
-    rm -rf dev-resources/public/js/*
-    rm -rf dev-resources/public/css/*
-    rm -rf prod-resources/public/js/*
-    rm -rf prod-resources/public/css/*
+    rm -rf dev-resources/*
+    rm -rf prod-resources/*
     rm -rf out/*
     npm install
