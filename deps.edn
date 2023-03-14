@@ -1,5 +1,5 @@
 {:paths ["resources"]
- :aliases {:dev {:extra-paths ["dev-resources" "classes"]
+ :aliases {:dev {:extra-paths ["dev-resources" "dev-src"]
                  :extra-deps {org.clojure/clojure {:mvn/version "1.11.1"}
                               thheller/shadow-cljs {:mvn/version "2.20.20"}
                               clj-kondo/clj-kondo {:mvn/version "2023.01.20"}
@@ -22,8 +22,6 @@
                                   org.clojure/data.json {:mvn/version "2.4.0"}
                                   org.clojure/data.csv {:mvn/version "1.0.1"}
                                   org.clojure/tools.logging {:mvn/version "1.2.4"}
-                                  commons-logging/commons-logging {:mvn/version "1.2"}
-                                  org.slf4j/slf4j-api {:mvn/version "2.0.6"}
                                   ch.qos.logback/logback-classic {:mvn/version "1.4.5"}
                                   ring/ring-core {:mvn/version "1.9.6"}
                                   ring/ring-jetty-adapter {:mvn/version "1.9.6"}
