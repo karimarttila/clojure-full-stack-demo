@@ -11,7 +11,8 @@
    [backend.webserver :as b-webserver]
    [backend.db.domain :as b-domain]
    [clojure.tools.reader.edn :as edn]
-   [potpuri.core :as p]))
+   [potpuri.core :as p])
+  (:gen-class))
 
 (defn env-value [key default]
   (some-> (or (System/getenv (name key)) default)))
@@ -102,7 +103,7 @@
     (ig-repl/go)))
 
 
-(comment
+#_(comment
   (ig-repl/reset)
   (ig-repl/halt)
   (user/system)

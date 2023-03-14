@@ -27,7 +27,7 @@
 ;; C-T alt+k: halt
 
 
-(comment
+#_(comment
   (user/system)
   (user/env)
    ; alt+j hotkey in Cursive

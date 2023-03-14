@@ -104,7 +104,7 @@
          [:div.p-4
           [:p.text-left.text-lg.font-bold.p-4 title]
           [:div.p-4
-           ;[product-groups-simple-table product-groups-data]
-           [:f> product-groups-react-table product-groups-data]
+           [product-groups-simple-table product-groups-data]
+           ;[:f> product-groups-react-table product-groups-data]
            ]]]))))
 

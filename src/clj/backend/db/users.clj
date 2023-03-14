@@ -122,7 +122,7 @@
   (buddy-jwt/unsign @my-atom my-hex-secret))
 
 
-(comment
+#_(comment
   (keys (user/env))
   (:db (user/env))
   (keys @(:db (user/env)))

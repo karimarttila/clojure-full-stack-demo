@@ -76,7 +76,7 @@
 
 
 ; Rich comment.
-(comment
+#_(comment
   (user/env)
   (test-config)
   *ns*

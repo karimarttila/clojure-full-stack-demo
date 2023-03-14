@@ -28,6 +28,13 @@
 @tailwind:
   npx tailwindcss -i ./src/css/app.css -o ./dev-resources/public/index.css --watch
 
+@build-uber:
+  clj -T:build uber
+
+@run-uber:
+  PROFILE=prod java -jar target/karimarttila/webstore-standalone.jar
+
+
 # Update dependencies.
 @outdated:
   # Backend

@@ -23,6 +23,7 @@
                                   org.clojure/data.csv {:mvn/version "1.0.1"}
                                   org.clojure/tools.logging {:mvn/version "1.2.4"}
                                   commons-logging/commons-logging {:mvn/version "1.2"}
+                                  org.slf4j/slf4j-api {:mvn/version "2.0.6"}
                                   ch.qos.logback/logback-classic {:mvn/version "1.4.5"}
                                   ring/ring-core {:mvn/version "1.9.6"}
                                   ring/ring-jetty-adapter {:mvn/version "1.9.6"}
@@ -63,8 +64,11 @@
            ;; Calva-specific
            :calva {:extra-deps {cider/cider-nrepl {:mvn/version,"0.30.0"}}}
 
-           ;; Depstar for building fat jar.
-           :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.216"}}
-                     :extra-paths ["prod-resources"]
-                     :main-opts ["-m" "hf.depstar.uberjar" "target/simpleserver.jar"]}}}
+           :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.4"}}
+                   :ns-default build}
+           ;; TODO remove later
+           #_#_:uberjar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.216"}}
+                         :extra-paths ["prod-resources"]
+                         :main-opts ["-m" "hf.depstar.uberjar" "target/simpleserver.jar"]}
+           }}
 

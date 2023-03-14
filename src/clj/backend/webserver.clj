@@ -230,7 +230,7 @@
      (reitit-ring/create-default-handler)))))
 
 ; Rich comment.
-(comment
+#_(comment
 
   (require '[clj-http.client])
 
