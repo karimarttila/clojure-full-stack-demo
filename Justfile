@@ -29,6 +29,12 @@
   npx tailwindcss -i ./src/css/app.css -o ./dev-resources/public/index.css --watch
 
 @build-uber:
+  echo "***** Building frontend *****"
+  rm -rf prod-resources
+  mkdir -p prod-resources/public/js  
+  npx tailwindcss -i ./src/css/app.css -o ./prod-resources/public/index.css
+  npx shadow-cljs release app
+  echo "***** Building backend *****"
   clj -T:build uber
 
 @run-uber:
@@ -45,3 +51,14 @@
   ncu -u
   npm install
 
+# Clean .cpcache and .shadow-cljs directories, run npm install
+@clean:
+    rm -rf .cpcache/*
+    rm -rf .shadow-cljs/*
+    rm -rf target/*
+    rm -rf dev-resources/public/js/*
+    rm -rf dev-resources/public/css/*
+    rm -rf prod-resources/public/js/*
+    rm -rf prod-resources/public/css/*
+    rm -rf out/*
+    npm install

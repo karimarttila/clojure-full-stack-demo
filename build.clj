@@ -20,12 +20,11 @@
          :ns-compile [main]))
 
 (defn uber [opts]
-  (println "***** Building uberjar *****")
   (println "Cleaning...")
   (b/delete {:path "target"})
   (let [opts (uber-opts opts)]
     (println "Copying files...")
-    (b/copy-dir {:src-dirs   ["resources" "src/clj" "src/cljc"]
+    (b/copy-dir {:src-dirs   ["resources" "prod-resources" "src/clj" "src/cljc"]
                  :target-dir class-dir})
     (println "Compiling files...")
     (b/compile-clj opts)
